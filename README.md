@@ -1,8 +1,6 @@
-# Starter for deploying [fast.ai](https://www.fast.ai) models with Starlette
+# simple indoor/outdoor climbing detector using fast.ai
 
-This repo can be used as a starting point to deploy [fast.ai](https://github.com/fastai/fastai) models with Starlette.
-
-See the Deployment notebook for hints
+This was built as part of taking the fast.ai course.
 
 To run locally:
 `python3 app/server.py`

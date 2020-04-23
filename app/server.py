@@ -1,17 +1,15 @@
 import aiohttp
 import asyncio
 import uvicorn
-from fastai2.vision.all import *
+from fastai.vision import *
 from io import BytesIO
 from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
-export_file_url = YOUR_GDRIVE_LINK_HERE
 export_file_name = 'export.pkl'
 
-classes = YOUR_CLASSES_HERE
 path = Path(__file__).parent
 
 app = Starlette()
@@ -29,10 +27,9 @@ async def download_file(url, dest):
 
 
 async def setup_learner():
-    await download_file(export_file_url, path / export_file_name)
     try:
-        learn = torch.load(path/export_file_name, map_location=torch.device('cpu'))
-        learn.dls.device = 'cpu'
+        defaults.device = torch.device('cpu')
+        learn = load_learner(Path(path/'models'))
         return learn
     except RuntimeError as e:
         if len(e.args) > 0 and 'CPU-only machine' in e.args[0]:
@@ -59,13 +56,11 @@ async def homepage(request):
 async def analyze(request):
   img_data = await request.form()
   img_bytes = await (img_data['file'].read())
-  img_np = np.array(Image.open(BytesIO(img_bytes)))
-  pred = learn.predict(BytesIO(img_bytes))
+  img = open_image(BytesIO(img_bytes));
+  pred_class,_,losses = learn.predict(img)
   return JSONResponse({
-      'result': str(pred[0])
+      'result': str(pred_class)
   })
-
-
 if __name__ == '__main__':
     if 'serve' in sys.argv:
         uvicorn.run(app=app, host='0.0.0.0', port=5000, log_level="info")
