@@ -3,4 +3,4 @@
 This was built as part of taking the fast.ai course.
 
 To run locally:
-`python3 app/server.py`
+`python3 app/server.py serve`
